@@ -4,7 +4,7 @@ from django.http import FileResponse, Http404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Video
+from videos_app.models import Video
 from .serializers import VideoSerializer
 
 

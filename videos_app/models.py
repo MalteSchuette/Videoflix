@@ -23,4 +23,4 @@ class Video(models.Model):
 def enqueue_video_processing(sender, instance, created, **kwargs):
     if created:
         queue = django_rq.get_queue('default')
-        queue.enqueue('videos.tasks.process_video', instance.id)
+        queue.enqueue('videos_app.tasks.process_video', instance.id)

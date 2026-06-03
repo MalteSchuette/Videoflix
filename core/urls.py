@@ -7,7 +7,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('django-rq/', include('django_rq.urls')),
     path('api/', include('users_app.api.urls')),
-    path('api/', include('videos.urls')),
+    path('api/', include('videos_app.api.urls')),
 ]
 
 if settings.DEBUG:

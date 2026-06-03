@@ -52,7 +52,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'django_rq',
     'users_app',
-    'videos',
+    'videos_app',
 ]
 
 AUTH_USER_MODEL = 'users_app.CustomUser'
