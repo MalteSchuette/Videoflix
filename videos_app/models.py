@@ -16,11 +16,13 @@ class Video(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
+        """Returns the video title as its string representation."""
         return self.title
 
 
 @receiver(post_save, sender=Video)
 def enqueue_video_processing(sender, instance, created, **kwargs):
+    """Enqueues the FFMPEG processing job when a new video is uploaded."""
     if created:
         queue = django_rq.get_queue('default')
         queue.enqueue('videos_app.tasks.process_video', instance.id)

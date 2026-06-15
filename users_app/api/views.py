@@ -16,11 +16,13 @@ User = get_user_model()
 
 
 def set_auth_cookies(response, access_token, refresh_token):
+    """Sets access_token and refresh_token as HttpOnly cookies on the response."""
     response.set_cookie('access_token', str(access_token), httponly=True, samesite='Lax')
     response.set_cookie('refresh_token', str(refresh_token), httponly=True, samesite='Lax')
 
 
 def delete_auth_cookies(response):
+    """Deletes the JWT auth cookies from the response."""
     response.delete_cookie('access_token')
     response.delete_cookie('refresh_token')
 
@@ -29,6 +31,7 @@ class RegisterView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
+        """Registers a new user and sends an activation email."""
         serializer = RegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
@@ -44,6 +47,7 @@ class ActivateView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, uidb64, token):
+        """Activates a user account using the uidb64 and token from the activation email."""
         try:
             uid = force_str(urlsafe_base64_decode(uidb64))
             user = User.objects.get(pk=uid)
@@ -60,6 +64,7 @@ class LoginView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
+        """Authenticates the user and sets JWT cookies on success."""
         email = request.data.get('email')
         password = request.data.get('password')
         user = User.objects.filter(email=email).first()
@@ -75,7 +80,9 @@ class LoginView(APIView):
 
 
 class LogoutView(APIView):
+
     def post(self, request):
+        """Logs out the user by blacklisting the refresh token and deleting auth cookies."""
         refresh_token = request.COOKIES.get('refresh_token')
         if not refresh_token:
             return Response({'detail': 'Refresh token missing.'}, status=status.HTTP_400_BAD_REQUEST)
@@ -95,6 +102,7 @@ class TokenRefreshView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
+        """Issues a new access token if the refresh token cookie is valid."""
         refresh_token = request.COOKIES.get('refresh_token')
         if not refresh_token:
             return Response({'detail': 'Refresh token missing.'}, status=status.HTTP_400_BAD_REQUEST)
@@ -112,6 +120,7 @@ class PasswordResetView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
+        """Sends a password reset email if a user with the given email exists."""
         serializer = PasswordResetSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data['email']
@@ -125,6 +134,7 @@ class PasswordConfirmView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request, uidb64, token):
+        """Resets the user's password after validating the uidb64 and token."""
         serializer = PasswordConfirmSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         try:

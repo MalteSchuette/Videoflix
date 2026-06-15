@@ -10,17 +10,20 @@ from .serializers import VideoSerializer
 
 class VideoListView(APIView):
     def get(self, request):
+        """Returns a list of all videos with their metadata."""
         videos = Video.objects.all()
         serializer = VideoSerializer(videos, many=True, context={'request': request})
         return Response(serializer.data)
 
 
 def build_hls_path(movie_id, resolution, filename):
+    """Builds the absolute filesystem path to an HLS file for a given video and resolution."""
     return os.path.join(settings.MEDIA_ROOT, 'videos', str(movie_id), resolution, filename)
 
 
 class HLSPlaylistView(APIView):
     def get(self, request, movie_id, resolution):
+        """Returns the HLS master playlist file for the given video and resolution."""
         path = build_hls_path(movie_id, resolution, 'index.m3u8')
         if not os.path.exists(path):
             raise Http404
@@ -29,6 +32,7 @@ class HLSPlaylistView(APIView):
 
 class HLSSegmentView(APIView):
     def get(self, request, movie_id, resolution, segment):
+        """Returns a single HLS video segment for the given video and resolution."""
         path = build_hls_path(movie_id, resolution, os.path.basename(segment))
         if not os.path.exists(path):
             raise Http404
