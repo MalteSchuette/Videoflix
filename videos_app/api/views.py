@@ -1,11 +1,11 @@
 import os
-from django.conf import settings
 from django.http import FileResponse, Http404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from videos_app.models import Video
 from .serializers import VideoSerializer
+from ..utils import build_hls_path
 
 
 class VideoListView(APIView):
@@ -14,11 +14,6 @@ class VideoListView(APIView):
         videos = Video.objects.all()
         serializer = VideoSerializer(videos, many=True, context={'request': request})
         return Response(serializer.data)
-
-
-def build_hls_path(movie_id, resolution, filename):
-    """Builds the absolute filesystem path to an HLS file for a given video and resolution."""
-    return os.path.join(settings.MEDIA_ROOT, 'videos', str(movie_id), resolution, filename)
 
 
 class HLSPlaylistView(APIView):

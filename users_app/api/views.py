@@ -10,21 +10,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 
 from .serializers import RegisterSerializer, UserSerializer, PasswordResetSerializer, PasswordConfirmSerializer
-from ..utils import send_activation_email, send_password_reset_email
+from ..utils import send_activation_email, send_password_reset_email, set_auth_cookies, delete_auth_cookies
 
 User = get_user_model()
-
-
-def set_auth_cookies(response, access_token, refresh_token):
-    """Sets access_token and refresh_token as HttpOnly cookies on the response."""
-    response.set_cookie('access_token', str(access_token), httponly=True, samesite='Lax')
-    response.set_cookie('refresh_token', str(refresh_token), httponly=True, samesite='Lax')
-
-
-def delete_auth_cookies(response):
-    """Deletes the JWT auth cookies from the response."""
-    response.delete_cookie('access_token')
-    response.delete_cookie('refresh_token')
 
 
 class RegisterView(APIView):
@@ -91,9 +79,7 @@ class LogoutView(APIView):
             token.blacklist()
         except TokenError:
             pass
-        response = Response(
-            {'detail': 'Logout successful! All tokens will be deleted. Refresh token is now invalid.'}
-        )
+        response = Response({'detail': 'Logout successful.'})
         delete_auth_cookies(response)
         return response
 

@@ -6,6 +6,18 @@ from django.conf import settings
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
+def set_auth_cookies(response, access_token, refresh_token):
+    """Sets access_token and refresh_token as HttpOnly cookies on the response."""
+    response.set_cookie('access_token', str(access_token), httponly=True, samesite='Lax')
+    response.set_cookie('refresh_token', str(refresh_token), httponly=True, samesite='Lax')
+
+
+def delete_auth_cookies(response):
+    """Deletes the JWT auth cookies from the response."""
+    response.delete_cookie('access_token')
+    response.delete_cookie('refresh_token')
+
+
 def generate_uid_token(user):
     """Generates a base64-encoded user ID and a signed token for use in email links."""
     uid = urlsafe_base64_encode(force_bytes(user.pk))

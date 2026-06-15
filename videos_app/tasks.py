@@ -42,13 +42,11 @@ def process_video(video_id):
     from .models import Video
     video = Video.objects.get(pk=video_id)
     input_path = video.video_file.path
-    base_dir = os.path.join(settings.MEDIA_ROOT, 'videos', str(video_id))
+    thumbnail_path = os.path.join(settings.MEDIA_ROOT, 'videos', str(video_id), 'thumbnail.jpg')
 
     for resolution, scale in RESOLUTIONS.items():
         convert_to_hls(input_path, get_output_dir(video_id, resolution), scale)
 
-    thumbnail_path = os.path.join(base_dir, 'thumbnail.jpg')
     generate_thumbnail(input_path, thumbnail_path)
-
     video.thumbnail = f'videos/{video_id}/thumbnail.jpg'
     video.save(update_fields=['thumbnail'])
