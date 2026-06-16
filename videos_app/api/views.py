@@ -1,5 +1,6 @@
 import os
 from django.http import FileResponse, Http404
+from django.middleware.csrf import get_token
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -13,7 +14,9 @@ class VideoListView(APIView):
         """Returns a list of all videos with their metadata."""
         videos = Video.objects.all()
         serializer = VideoSerializer(videos, many=True, context={'request': request})
-        return Response(serializer.data)
+        response = Response(serializer.data)
+        response.set_cookie('csrftoken', get_token(request), samesite='Lax')
+        return response
 
 
 class HLSPlaylistView(APIView):

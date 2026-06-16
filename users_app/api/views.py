@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
+from django.middleware.csrf import get_token
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
 from rest_framework import status
@@ -9,7 +10,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 
-from .serializers import RegisterSerializer, UserSerializer, PasswordResetSerializer, PasswordConfirmSerializer
+from .serializers import RegisterSerializer, PasswordResetSerializer, PasswordConfirmSerializer
 from ..utils import send_activation_email, send_password_reset_email, set_auth_cookies, delete_auth_cookies
 
 User = get_user_model()
@@ -24,11 +25,7 @@ class RegisterView(APIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         send_activation_email(user)
-        refresh = RefreshToken.for_user(user)
-        return Response({
-            'user': UserSerializer(user).data,
-            'token': str(refresh.access_token),
-        }, status=status.HTTP_201_CREATED)
+        return Response({'detail': 'Registration successful. Please check your email to activate your account.'}, status=status.HTTP_201_CREATED)
 
 
 class ActivateView(APIView):
@@ -64,10 +61,12 @@ class LoginView(APIView):
             'user': {'id': user.id, 'username': user.email},
         })
         set_auth_cookies(response, refresh.access_token, refresh)
+        get_token(request)
         return response
 
 
 class LogoutView(APIView):
+    permission_classes = [AllowAny]
 
     def post(self, request):
         """Logs out the user by blacklisting the refresh token and deleting auth cookies."""
@@ -98,7 +97,7 @@ class TokenRefreshView(APIView):
         except TokenError:
             return Response({'detail': 'Invalid refresh token.'}, status=status.HTTP_401_UNAUTHORIZED)
         response = Response({'detail': 'Token refreshed', 'access': str(access_token)})
-        response.set_cookie('access_token', str(access_token), httponly=True, samesite='Lax')
+        set_auth_cookies(response, access_token, token)
         return response
 
 
