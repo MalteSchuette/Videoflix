@@ -13,11 +13,13 @@ class RegisterSerializer(serializers.ModelSerializer):
         extra_kwargs = {'password': {'write_only': True}}
 
     def validate(self, data):
+        """Checks that password and confirmed_password match."""
         if data['password'] != data['confirmed_password']:
             raise serializers.ValidationError('Passwords do not match.')
         return data
 
     def create(self, validated_data):
+        """Removes the confirmation field and creates the user via the custom user manager."""
         validated_data.pop('confirmed_password')
         return User.objects.create_user(**validated_data)
 
@@ -37,6 +39,7 @@ class PasswordConfirmSerializer(serializers.Serializer):
     confirm_password = serializers.CharField()
 
     def validate(self, data):
+        """Checks that new_password and confirm_password match."""
         if data['new_password'] != data['confirm_password']:
             raise serializers.ValidationError('Passwords do not match.')
         return data
