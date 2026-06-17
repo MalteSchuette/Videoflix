@@ -130,14 +130,17 @@ CACHES = {
     }
 }
 
+_REDIS_QUEUE_BASE = {
+    'HOST': os.environ.get("REDIS_HOST", default="redis"),
+    'PORT': os.environ.get("REDIS_PORT", default=6379),
+    'DB': os.environ.get("REDIS_DB", default=0),
+    'REDIS_CLIENT_KWARGS': {},
+}
+
 RQ_QUEUES = {
-    'default': {
-        'HOST': os.environ.get("REDIS_HOST", default="redis"),
-        'PORT': os.environ.get("REDIS_PORT", default=6379),
-        'DB': os.environ.get("REDIS_DB", default=0),
-        'DEFAULT_TIMEOUT': 900,
-        'REDIS_CLIENT_KWARGS': {},
-    },
+    'default': {**_REDIS_QUEUE_BASE, 'DEFAULT_TIMEOUT': 900},
+    'high': {**_REDIS_QUEUE_BASE, 'DEFAULT_TIMEOUT': 60},
+    'low': {**_REDIS_QUEUE_BASE, 'DEFAULT_TIMEOUT': 1800},
 }
 
 # Password validation

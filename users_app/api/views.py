@@ -10,8 +10,10 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 
+import django_rq
+
 from .serializers import RegisterSerializer, PasswordResetSerializer, PasswordConfirmSerializer
-from ..utils import send_activation_email, send_password_reset_email, set_auth_cookies, delete_auth_cookies
+from ..utils import set_auth_cookies, delete_auth_cookies
 
 User = get_user_model()
 
@@ -24,7 +26,7 @@ class RegisterView(APIView):
         serializer = RegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        send_activation_email(user)
+        django_rq.get_queue('high').enqueue('users_app.tasks.task_send_activation_email', user.id)
         return Response({'detail': 'Registration successful. Please check your email to activate your account.'}, status=status.HTTP_201_CREATED)
 
 
@@ -111,7 +113,7 @@ class PasswordResetView(APIView):
         email = serializer.validated_data['email']
         user = User.objects.filter(email=email).first()
         if user:
-            send_password_reset_email(user)
+            django_rq.get_queue('high').enqueue('users_app.tasks.task_send_password_reset_email', user.id)
         return Response({'detail': 'An email has been sent to reset your password.'})
 
 

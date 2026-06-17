@@ -29,6 +29,7 @@ _BASE_STYLE = (
 
 
 def get_activation_email_html(username: str, activation_url: str) -> str:
+    """Returns the HTML string for the account activation email with the Videoflix logo at the top."""
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -71,6 +72,7 @@ def get_activation_email_html(username: str, activation_url: str) -> str:
 
 
 def get_password_reset_email_html(reset_url: str) -> str:
+    """Returns the HTML string for the password reset email with the Videoflix logo at the bottom."""
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
