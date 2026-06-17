@@ -48,5 +48,8 @@ def process_video(video_id):
         convert_to_hls(input_path, get_output_dir(video_id, resolution), scale)
 
     generate_thumbnail(input_path, thumbnail_path)
+
+    os.remove(input_path)
     video.thumbnail = f'videos/{video_id}/thumbnail.jpg'
-    video.save(update_fields=['thumbnail'])
+    video.video_file = ''
+    video.save(update_fields=['thumbnail', 'video_file'])
