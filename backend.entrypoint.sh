@@ -2,11 +2,11 @@
 
 set -e
 
-echo "Warte auf PostgreSQL auf $DB_HOST:$DB_PORT..."
+echo "Warte auf PostgreSQL auf ${DB_HOST:-db}:${DB_PORT:-5432}..."
 
 # -q für "quiet" (keine Ausgabe außer Fehlern)
 # Die Schleife läuft, solange pg_isready *nicht* erfolgreich ist (Exit-Code != 0)
-while ! pg_isready -h "$DB_HOST" -p "$DB_PORT" -q; do
+while ! pg_isready -h "${DB_HOST:-db}" -p "${DB_PORT:-5432}" -q; do
   echo "PostgreSQL ist nicht erreichbar - schlafe 1 Sekunde"
   sleep 1
 done
