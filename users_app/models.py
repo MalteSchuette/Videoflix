@@ -1,10 +1,13 @@
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import (
+    AbstractBaseUser, BaseUserManager, PermissionsMixin,
+)
 from django.db import models
 
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
-        """Creates and returns a regular user with the given email and password."""
+        """Creates and returns a regular user with the given email
+        and password."""
         if not email:
             raise ValueError('Email is required')
         email = self.normalize_email(email)
@@ -13,8 +16,11 @@ class CustomUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password=None, username=None, **extra_fields):
-        """Creates and returns a superuser with staff and superuser permissions."""
+    def create_superuser(
+        self, email, password=None, username=None, **extra_fields
+    ):
+        """Creates and returns a superuser with staff and superuser
+        permissions."""
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_active', True)
@@ -33,5 +39,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     objects = CustomUserManager()
 
     def __str__(self):
-        """Returns the email address as the string representation of the user."""
+        """Returns the email address as the string representation of
+        the user."""
         return self.email

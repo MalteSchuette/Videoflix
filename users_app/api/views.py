@@ -12,7 +12,9 @@ from rest_framework_simplejwt.exceptions import TokenError
 
 import django_rq
 
-from .serializers import RegisterSerializer, PasswordResetSerializer, PasswordConfirmSerializer
+from .serializers import (
+    RegisterSerializer, PasswordResetSerializer, PasswordConfirmSerializer,
+)
 from ..utils import set_auth_cookies, delete_auth_cookies
 
 User = get_user_model()
@@ -26,22 +28,39 @@ class RegisterView(APIView):
         serializer = RegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        django_rq.get_queue('high').enqueue('users_app.tasks.task_send_activation_email', user.id)
-        return Response({'detail': 'Registration successful. Please check your email to activate your account.'}, status=status.HTTP_201_CREATED)
+        django_rq.get_queue('high').enqueue(
+            'users_app.tasks.task_send_activation_email', user.id
+        )
+        return Response(
+            {
+                'detail': (
+                    'Registration successful. Please check your email'
+                    ' to activate your account.'
+                )
+            },
+            status=status.HTTP_201_CREATED,
+        )
 
 
 class ActivateView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, uidb64, token):
-        """Activates a user account using the uidb64 and token from the activation email."""
+        """Activates a user account using the uidb64 and token from
+        the activation email."""
         try:
             uid = force_str(urlsafe_base64_decode(uidb64))
             user = User.objects.get(pk=uid)
         except (User.DoesNotExist, ValueError):
-            return Response({'error': 'Activation failed.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'error': 'Activation failed.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         if not default_token_generator.check_token(user, token):
-            return Response({'error': 'Activation failed.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'error': 'Activation failed.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         user.is_active = True
         user.save()
         return Response({'message': 'Account successfully activated.'})
@@ -56,7 +75,10 @@ class LoginView(APIView):
         password = request.data.get('password')
         user = User.objects.filter(email=email).first()
         if not user or not user.check_password(password) or not user.is_active:
-            return Response({'detail': 'Invalid credentials.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'detail': 'Invalid credentials.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         refresh = RefreshToken.for_user(user)
         response = Response({
             'detail': 'Login successful',
@@ -71,10 +93,14 @@ class LogoutView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        """Logs out the user by blacklisting the refresh token and deleting auth cookies."""
+        """Logs out the user by blacklisting the refresh token and
+        deleting auth cookies."""
         refresh_token = request.COOKIES.get('refresh_token')
         if not refresh_token:
-            return Response({'detail': 'Refresh token missing.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'detail': 'Refresh token missing.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         try:
             token = RefreshToken(refresh_token)
             token.blacklist()
@@ -92,13 +118,22 @@ class TokenRefreshView(APIView):
         """Issues a new access token if the refresh token cookie is valid."""
         refresh_token = request.COOKIES.get('refresh_token')
         if not refresh_token:
-            return Response({'detail': 'Refresh token missing.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'detail': 'Refresh token missing.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         try:
             token = RefreshToken(refresh_token)
             access_token = token.access_token
         except TokenError:
-            return Response({'detail': 'Invalid refresh token.'}, status=status.HTTP_401_UNAUTHORIZED)
-        response = Response({'detail': 'Token refreshed', 'access': str(access_token)})
+            return Response(
+                {'detail': 'Invalid refresh token.'},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+        response = Response({
+            'detail': 'Token refreshed',
+            'access': str(access_token),
+        })
         set_auth_cookies(response, access_token, token)
         return response
 
@@ -107,14 +142,19 @@ class PasswordResetView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        """Sends a password reset email if a user with the given email exists."""
+        """Sends a password reset email if a user with the given email
+        exists."""
         serializer = PasswordResetSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data['email']
         user = User.objects.filter(email=email).first()
         if user:
-            django_rq.get_queue('high').enqueue('users_app.tasks.task_send_password_reset_email', user.id)
-        return Response({'detail': 'An email has been sent to reset your password.'})
+            django_rq.get_queue('high').enqueue(
+                'users_app.tasks.task_send_password_reset_email', user.id
+            )
+        return Response(
+            {'detail': 'An email has been sent to reset your password.'}
+        )
 
 
 class PasswordConfirmView(APIView):
@@ -128,9 +168,17 @@ class PasswordConfirmView(APIView):
             uid = force_str(urlsafe_base64_decode(uidb64))
             user = User.objects.get(pk=uid)
         except (User.DoesNotExist, ValueError):
-            return Response({'error': 'Invalid link.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'error': 'Invalid link.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         if not default_token_generator.check_token(user, token):
-            return Response({'error': 'Invalid or expired token.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'error': 'Invalid or expired token.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         user.set_password(serializer.validated_data['new_password'])
         user.save()
-        return Response({'detail': 'Your Password has been successfully reset.'})
+        return Response(
+            {'detail': 'Your Password has been successfully reset.'}
+        )

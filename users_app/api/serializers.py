@@ -19,7 +19,8 @@ class RegisterSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        """Removes the confirmation field and creates the user via the custom user manager."""
+        """Removes the confirmation field and creates the user via the
+        custom user manager."""
         validated_data.pop('confirmed_password')
         return User.objects.create_user(**validated_data)
 

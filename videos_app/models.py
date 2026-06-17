@@ -33,7 +33,8 @@ def enqueue_video_processing(sender, instance, created, **kwargs):
 
 @receiver(post_delete, sender=Video)
 def delete_video_files(sender, instance, **kwargs):
-    """Deletes all media files associated with a video after it is removed from the database."""
+    """Deletes all media files associated with a video after it is
+    removed from the database."""
     if instance.video_file and instance.video_file.name:
         original_path = instance.video_file.path
         if os.path.isfile(original_path):
