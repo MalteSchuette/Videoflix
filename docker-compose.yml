@@ -4,25 +4,36 @@ services:
     image: postgres:latest
     container_name: videoflix_database
     environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME:-videoflix_db}
+      POSTGRES_USER: ${DB_USER:-videoflix_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-supersecretpassword}
     volumes:
       - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-videoflix_user} -d ${DB_NAME:-videoflix_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   redis:
     image: redis:latest
     container_name: videoflix_redis
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   web:
     build:
       context: .
       dockerfile: backend.Dockerfile
-    env_file: .env
+    env_file:
+      - path: .env
+        required: false
     container_name: videoflix_backend
-
     volumes:
       - .:/app
       - videoflix_media:/app/media
@@ -32,8 +43,10 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
 
 
