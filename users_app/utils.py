@@ -41,7 +41,7 @@ def send_activation_email(user):
         f"?uid={uid}&token={token}"
     )
     html = get_activation_email_html(
-        username=user.username, activation_url=activation_link
+        username=user.email, activation_url=activation_link
     )
     email = EmailMultiAlternatives(
         subject='Confirm your email',
