@@ -1,12 +1,44 @@
+import os
+from email.mime.image import MIMEImage
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
 from django.contrib.auth.tokens import default_token_generator
-from django.core.mail import EmailMultiAlternatives
+from django.core.mail import EmailMessage, get_connection
+from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.conf import settings
 from rest_framework_simplejwt.tokens import RefreshToken
-from users_app.email_templates import (
-    get_activation_email_html, get_password_reset_email_html,
+
+_LOGO_PATH = os.path.join(
+    os.path.dirname(__file__),
+    "static", "users_app", "images", "Logo.png"
 )
+with open(_LOGO_PATH, "rb") as _f:
+    _LOGO_DATA = _f.read()
+
+
+def _send_html_email(subject, html, to):
+    """Sends an HTML email with an inline logo using multipart/related."""
+    msg = MIMEMultipart("related")
+    msg["Subject"] = subject
+    msg["From"] = settings.DEFAULT_FROM_EMAIL
+    msg["To"] = to
+
+    msg.attach(MIMEText(html, "html", "utf-8"))
+
+    logo = MIMEImage(_LOGO_DATA)
+    logo.add_header("Content-ID", "<logo>")
+    logo.add_header("Content-Disposition", "inline", filename="Logo.png")
+    msg.attach(logo)
+
+    connection = get_connection()
+    connection.open()
+    connection.connection.sendmail(
+        settings.DEFAULT_FROM_EMAIL, [to], msg.as_string()
+    )
+    connection.close()
 
 
 def set_auth_cookies(response, access_token, refresh_token):
@@ -40,17 +72,15 @@ def send_activation_email(user):
         f"{settings.FRONTEND_URL}/pages/auth/activate.html"
         f"?uid={uid}&token={token}"
     )
-    html = get_activation_email_html(
-        username=user.email, activation_url=activation_link
-    )
-    email = EmailMultiAlternatives(
+    html = render_to_string("activation_email.html", {
+        "username": user.email,
+        "activation_url": activation_link,
+    })
+    _send_html_email(
         subject='Confirm your email',
-        body=f'Please activate your account: {activation_link}',
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        to=[user.email],
+        html=html,
+        to=user.email,
     )
-    email.attach_alternative(html, 'text/html')
-    email.send()
 
 
 def send_password_reset_email(user):
@@ -59,12 +89,11 @@ def send_password_reset_email(user):
         f"{settings.FRONTEND_URL}/pages/auth/confirm_password.html"
         f"?uid={uid}&token={token}"
     )
-    html = get_password_reset_email_html(reset_url=reset_link)
-    email = EmailMultiAlternatives(
+    html = render_to_string("password_reset_email.html", {
+        "reset_url": reset_link,
+    })
+    _send_html_email(
         subject='Reset your Password',
-        body=f'Reset your password: {reset_link}',
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        to=[user.email],
+        html=html,
+        to=user.email,
     )
-    email.attach_alternative(html, 'text/html')
-    email.send()
