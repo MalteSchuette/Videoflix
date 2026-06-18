@@ -18,6 +18,7 @@ env/
 db.sqlite3
 media/
 static/
+!users_app/static/
 
 # Environment variables
 .env
@@ -38,3 +39,4 @@ Thumbs.db
 # Project docs
 *.pdf
 *.html
+!users_app/templates/*.html
