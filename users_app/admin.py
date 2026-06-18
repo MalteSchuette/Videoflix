@@ -5,6 +5,8 @@ from .models import CustomUser
 
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
+    """Admin configuration for CustomUser with email-based display and search."""
+
     ordering = ['email']
     list_display = ['email', 'is_active', 'is_staff']
     fieldsets = (

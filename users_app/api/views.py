@@ -21,6 +21,8 @@ User = get_user_model()
 
 
 class RegisterView(APIView):
+    """Handles new user registration and triggers the activation email."""
+
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -43,6 +45,8 @@ class RegisterView(APIView):
 
 
 class ActivateView(APIView):
+    """Activates a user account via the link sent in the registration email."""
+
     permission_classes = [AllowAny]
 
     def get(self, request, uidb64, token):
@@ -67,6 +71,8 @@ class ActivateView(APIView):
 
 
 class LoginView(APIView):
+    """Authenticates a user and issues JWT tokens as HttpOnly cookies."""
+
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -90,6 +96,8 @@ class LoginView(APIView):
 
 
 class LogoutView(APIView):
+    """Logs out the user by blacklisting the refresh token and clearing cookies."""
+
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -112,6 +120,8 @@ class LogoutView(APIView):
 
 
 class TokenRefreshView(APIView):
+    """Issues a new access token using the refresh token stored in the cookie."""
+
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -139,6 +149,8 @@ class TokenRefreshView(APIView):
 
 
 class PasswordResetView(APIView):
+    """Sends a password reset email for the given user account."""
+
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -158,6 +170,8 @@ class PasswordResetView(APIView):
 
 
 class PasswordConfirmView(APIView):
+    """Validates the reset token and sets a new password for the user."""
+
     permission_classes = [AllowAny]
 
     def post(self, request, uidb64, token):

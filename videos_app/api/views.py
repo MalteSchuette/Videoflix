@@ -10,6 +10,8 @@ from ..utils import build_hls_path
 
 
 class VideoListView(APIView):
+    """Returns a list of all available videos."""
+
     def get(self, request):
         """Returns a list of all videos with their metadata."""
         videos = Video.objects.all()
@@ -22,6 +24,8 @@ class VideoListView(APIView):
 
 
 class HLSPlaylistView(APIView):
+    """Serves the HLS master playlist for a given video and resolution."""
+
     def get(self, request, movie_id, resolution):
         """Returns the HLS master playlist file for the given video
         and resolution."""
@@ -35,6 +39,8 @@ class HLSPlaylistView(APIView):
 
 
 class HLSSegmentView(APIView):
+    """Serves individual HLS video segments for streaming."""
+
     def get(self, request, movie_id, resolution, segment):
         """Returns a single HLS video segment for the given video
         and resolution."""

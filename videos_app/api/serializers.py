@@ -3,6 +3,8 @@ from videos_app.models import Video
 
 
 class VideoSerializer(serializers.ModelSerializer):
+    """Serializes Video model instances for API responses."""
+
     thumbnail_url = serializers.SerializerMethodField()
 
     class Meta:

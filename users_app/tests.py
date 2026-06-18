@@ -29,6 +29,8 @@ def create_active_user(email='test@example.com', password='Test1234!'):
     EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend'
 )
 class RegisterViewTests(APITestCase):
+    """Tests for the user registration endpoint."""
+
     def test_register_success(self):
         """Checks that a valid registration returns 201 and creates an
         inactive user."""
@@ -62,6 +64,8 @@ class RegisterViewTests(APITestCase):
 
 
 class ActivateViewTests(APITestCase):
+    """Tests for the account activation endpoint."""
+
     def test_activate_success(self):
         """Checks that a valid UID and token activate the user account."""
         user = User.objects.create_user(
@@ -88,6 +92,8 @@ class ActivateViewTests(APITestCase):
 
 
 class LoginViewTests(APITestCase):
+    """Tests for the login endpoint."""
+
     def setUp(self):
         """Creates an active user for login tests."""
         self.user = create_active_user()
@@ -123,6 +129,8 @@ class LoginViewTests(APITestCase):
 
 
 class LogoutViewTests(APITestCase):
+    """Tests for the logout endpoint."""
+
     def setUp(self):
         """Creates an active user and sets JWT cookies for logout tests."""
         self.user = create_active_user()
@@ -143,6 +151,8 @@ class LogoutViewTests(APITestCase):
 
 
 class TokenRefreshViewTests(APITestCase):
+    """Tests for the token refresh endpoint."""
+
     def setUp(self):
         """Creates an active user and sets the refresh token cookie for
         token refresh tests."""
@@ -167,6 +177,8 @@ class TokenRefreshViewTests(APITestCase):
     EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend'
 )
 class PasswordResetViewTests(APITestCase):
+    """Tests for the password reset request endpoint."""
+
     def setUp(self):
         """Creates an active user for password reset tests."""
         self.user = create_active_user(email='reset@example.com')
@@ -188,6 +200,8 @@ class PasswordResetViewTests(APITestCase):
 
 
 class PasswordConfirmViewTests(APITestCase):
+    """Tests for the password reset confirmation endpoint."""
+
     def setUp(self):
         """Creates an active user and generates a valid UID and token for
         password confirm tests."""

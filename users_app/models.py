@@ -5,6 +5,8 @@ from django.db import models
 
 
 class CustomUserManager(BaseUserManager):
+    """Manager for CustomUser that uses email as the unique identifier."""
+
     def create_user(self, email, password=None, **extra_fields):
         """Creates and returns a regular user with the given email
         and password."""
@@ -28,6 +30,8 @@ class CustomUserManager(BaseUserManager):
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
+    """Custom user model that authenticates via email instead of username."""
+
     email = models.EmailField(unique=True)
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)

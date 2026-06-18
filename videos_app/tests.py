@@ -26,6 +26,8 @@ def auth_client(client, user):
 
 
 class VideoListViewTests(APITestCase):
+    """Tests for the video list endpoint."""
+
     def setUp(self):
         """Creates an authenticated test user for video list tests."""
         self.user = create_active_user()
@@ -54,6 +56,8 @@ class VideoListViewTests(APITestCase):
 
 
 class HLSPlaylistViewTests(APITestCase):
+    """Tests for the HLS playlist endpoint."""
+
     def setUp(self):
         """Creates an authenticated test user for HLS playlist tests."""
         self.user = create_active_user()
@@ -73,6 +77,8 @@ class HLSPlaylistViewTests(APITestCase):
 
 
 class HLSSegmentViewTests(APITestCase):
+    """Tests for the HLS segment endpoint."""
+
     def setUp(self):
         """Creates an authenticated test user for HLS segment tests."""
         self.user = create_active_user()

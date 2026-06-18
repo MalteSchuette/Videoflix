@@ -5,6 +5,8 @@ User = get_user_model()
 
 
 class RegisterSerializer(serializers.ModelSerializer):
+    """Validates and creates a new user with email and matching passwords."""
+
     confirmed_password = serializers.CharField(write_only=True)
 
     class Meta:
@@ -26,16 +28,22 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    """Serializes basic user information (id and email)."""
+
     class Meta:
         model = User
         fields = ['id', 'email']
 
 
 class PasswordResetSerializer(serializers.Serializer):
+    """Validates the email address for a password reset request."""
+
     email = serializers.EmailField()
 
 
 class PasswordConfirmSerializer(serializers.Serializer):
+    """Validates that the new password and confirmation password match."""
+
     new_password = serializers.CharField()
     confirm_password = serializers.CharField()
 
