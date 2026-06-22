@@ -38,6 +38,7 @@ def generate_thumbnail(input_path, output_path):
         'ffmpeg', '-i', input_path,
         '-ss', '00:00:01',
         '-vframes', '1',
+        '-update', '1',
         output_path,
     ], check=True)
 
