@@ -24,6 +24,7 @@ def convert_to_hls(input_path, output_dir, scale):
     subprocess.run([
         'ffmpeg', '-i', input_path,
         '-vf', scale,
+        '-pix_fmt', 'yuv420p',
         '-hls_time', '10',
         '-hls_list_size', '0',
         '-hls_segment_filename', os.path.join(output_dir, '%03d.ts'),
