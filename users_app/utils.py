@@ -37,8 +37,8 @@ def set_auth_cookies(response, access_token, refresh_token):
 
 def delete_auth_cookies(response):
     """Deletes the JWT auth cookies from the response."""
-    response.delete_cookie('access_token')
-    response.delete_cookie('refresh_token')
+    response.delete_cookie('access_token', samesite='Lax')
+    response.delete_cookie('refresh_token', samesite='Lax')
 
 
 def generate_uid_token(user):
