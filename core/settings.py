@@ -146,7 +146,7 @@ _REDIS_QUEUE_BASE = {
 RQ_QUEUES = {
     'default': {**_REDIS_QUEUE_BASE, 'DEFAULT_TIMEOUT': 900},
     'high': {**_REDIS_QUEUE_BASE, 'DEFAULT_TIMEOUT': 60},
-    'low': {**_REDIS_QUEUE_BASE, 'DEFAULT_TIMEOUT': 1800},
+    'low': {**_REDIS_QUEUE_BASE, 'DEFAULT_TIMEOUT': 7200},
 }
 
 # Password validation
