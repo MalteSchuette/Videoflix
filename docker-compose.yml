@@ -38,6 +38,8 @@ services:
       - .:/app
       - videoflix_media:/app/media
       - videoflix_static:/app/static
+    ports:
+      - "127.0.0.1:8001:8000"
     environment:
       - PYTHONUNBUFFERED=1
       - DB_HOST=${DB_HOST:-db}
@@ -53,19 +55,6 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-
-  nginx:
-    image: nginx:alpine
-    container_name: videoflix_nginx
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
-      - ../frontend:/var/www/frontend:ro
-      - videoflix_static:/var/www/static:ro
-      - videoflix_media:/var/www/media:ro
-    depends_on:
-      - web
 
 
 volumes:
